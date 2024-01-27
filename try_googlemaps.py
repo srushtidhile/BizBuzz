@@ -34,7 +34,8 @@ def init_db():
             timezone TEXT,
             audience TEXT,
             event_type TEXT,
-            business_email TEXT
+            business_email TEXT,
+            likes INT
         )
     ''')
 
@@ -49,8 +50,8 @@ def insert_event(data):
 
     cursor.execute('''
         INSERT INTO events
-        (business_name, address, event_description, start_datetime, end_datetime, timezone, audience, event_type, business_email)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (business_name, address, event_description, start_datetime, end_datetime, timezone, audience, event_type, business_email, likes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', data)
 
     conn.commit()
@@ -130,12 +131,13 @@ def business_page():
     event_type_options = st.multiselect("Select Event Type", ["Art", "Music", "Food", "Social", "Entertainment", "Holiday"])
 
     business_email = st.text_input("Business Email (not displayed on post)")
+    likes = 0
 
     if st.button("Submit"):
         data = (
             business_name, address, event_description,
             start_datetime, end_datetime,
-            timezone, ", ".join(audience_options), ", ".join(event_type_options), business_email
+            timezone, ", ".join(audience_options), ", ".join(event_type_options), business_email, likes
         )
 
         insert_event(data)
@@ -173,9 +175,36 @@ def display_posts(user_latitude, user_longitude):
             st.write("Business Name:", event[1])
             st.write("Event Description:", event[3])
             st.write("Distance:", f"{distance:.2f} km")
-            st.button("Like")  # Add like functionality
-        
 
+            # Use a unique identifier for the like button based on event ID
+            like_button_key = f"like_button_{event[0]}"
+
+            # Fetch current likes count
+            cursor.execute('SELECT likes FROM events WHERE id = ?', (event[0],))
+            current_likes = cursor.fetchone()[0]
+
+            # Display current likes count
+            st.write("Likes:", current_likes)
+
+            # Check if the Like button is clicked
+            if st.button("Like", key=like_button_key):
+                update_likes(event[0])  # Update likes for the specific event
+
+    conn.close()
+
+# Function to update the "likes" attribute for a specific event
+def update_likes(event_id):
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    # Fetch current likes count
+    cursor.execute('SELECT likes FROM events WHERE id = ?', (event_id,))
+    current_likes = cursor.fetchone()[0]
+
+    # Update likes count
+    cursor.execute('UPDATE events SET likes = ? WHERE id = ?', (current_likes + 1, event_id))
+
+    conn.commit()
     conn.close()
 
 # Function to calculate distance between two locations
