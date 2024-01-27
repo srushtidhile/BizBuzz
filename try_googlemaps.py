@@ -260,31 +260,36 @@ def display_posts(user_latitude, user_longitude, selected_event_types, selected_
 
     cursor.execute(query, params)
     events = cursor.fetchall()
-
+    cols = st.columns(3)
+    col_num = -1
     for event in events:
+        col_num += 1
+        col_num = col_num % 3
         distance = calculate_distance(user_latitude, user_longitude, event[2])
         if distance is not None and distance < 50:  # Display events within 50 km radius for example
-            st.write("Business Name:", event[1])
-            st.write("Event Description:", event[3])
-            st.write("Distance:", f"{distance:.2f} km")
-            st.write("Start Date:", event[4])
-            st.write("End Date:", event[5])
-            st.write("Audience:", event[7])
-            st.write("Event Type:", event[8])
+            with cols[col_num]:
+                with st.container(border=True,):
+                    st.header(event[1])
+                    st.write("Event Description:", event[3])
+                    st.write("Distance:", f"{distance:.2f} km")
+                    st.write("📍", event[2])
+                    st.write("📅", event[4], "-", event[5])
+                    st.write("Audience:", event[7])
+                    st.write("Event Type:", event[8])
 
-            # Use a unique identifier for the like button based on event ID
-            like_button_key = f"like_button_{event[0]}"
+                    # Use a unique identifier for the like button based on event ID
+                    like_button_key = f"like_button_{event[0]}"
 
-            # Fetch current likes count
-            cursor.execute('SELECT likes FROM events WHERE id = ?', (event[0],))
-            current_likes = cursor.fetchone()[0]
+                    # Fetch current likes count
+                    cursor.execute('SELECT likes FROM events WHERE id = ?', (event[0],))
+                    current_likes = cursor.fetchone()[0]
 
-            # Display current likes count
-            st.write("Likes:", current_likes)
+                    # Display current likes count
+                    st.write("Likes:", current_likes)
 
-            # Check if the Like button is clicked
-            if st.button("Like", key=like_button_key):
-                update_likes(event[0])  # Update likes for the specific event
+                    # Check if the Like button is clicked
+                    if st.button("❤", key=like_button_key):
+                        update_likes(event[0])  # Update likes for the specific event
 
     conn.close()
 
@@ -304,7 +309,7 @@ def update_likes(event_id):
     conn.close()
 
 # Function to calculate distance between two locations
-def calculate_distance(lat1, lon1, address) -> int:
+def calculate_distance(lat1, lon1, address) -> float:
     geolocator = Nominatim(user_agent="event_platform")
     location = geolocator.geocode(address)
     if location:
@@ -320,7 +325,7 @@ def calculate_distance(lat1, lon1, address) -> int:
 
         # Convert distance to kilometers
         distance_in_km = distance / 1000
-        return int(distance_in_km)  # Convert to kilometers
+        return float(distance_in_km)  # Convert to kilometers
 
 # Run the app
 if __name__ == "__main__":
