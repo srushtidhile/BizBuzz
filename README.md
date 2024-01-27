@@ -1,3 +1,3 @@
 # BizBuzz
 
-Group members: Lantian Yang
+Group members: Lantian Yang, Xiaobai Jiang
