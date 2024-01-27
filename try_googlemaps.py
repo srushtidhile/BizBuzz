@@ -123,7 +123,7 @@ def home_page():
     # st.markdown('<div class="header">Welcome to BizBuzz!</div>', unsafe_allow_html=True)
     welcome_image = "./images/welcome_image.png"
     st.markdown('<div class="button-container">', unsafe_allow_html=True)
-    st.image(welcome_image, use_column_width=False)
+    st.image(welcome_image, use_column_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
     # st.markdown('<div class="subheader">Select an Option:</div>', unsafe_allow_html=True)
 
