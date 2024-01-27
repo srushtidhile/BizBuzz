@@ -64,8 +64,8 @@ def subscribe_email(email, location):
     conn.close()
 
 def subscription_page():
-    st.title("Subscription Page")
-    st.header("Subscribe for Event Notifications")
+    st.title("Subscribe for Event Notifications!")
+    # st.header("Subscribe for Event Notifications")
 
     email = st.text_input("Enter Your Email")
     user_location = st.text_input("Enter Your Location")
@@ -120,20 +120,28 @@ def home_page():
         custom_style = f.read()
         st.markdown(f'<style>{custom_style}</style>', unsafe_allow_html=True)
 
-    st.markdown('<div class="header">Welcome to BizBuzz!</div>', unsafe_allow_html=True)
+    # st.markdown('<div class="header">Welcome to BizBuzz!</div>', unsafe_allow_html=True)
+    welcome_image = "./images/welcome_image.png"
+    st.image(welcome_image, use_column_width=False)
     # st.markdown('<div class="subheader">Select an Option:</div>', unsafe_allow_html=True)
 
     # button_container = st.markdown('<div class="button-container">', unsafe_allow_html=True)
-    business_btn, customer_btn, subscription_btn = st.sidebar.columns([1, 1, 1])
-    business_btn = st.button("Business", kwargs={
-        'clicked_button_ix': 1, 'n_buttons': 3
-        })
-    customer_btn = st.button("Customer", kwargs={
-        'clicked_button_ix': 2, 'n_buttons': 3
-        })
-    subscription_btn = st.button("Subscription", kwargs={
-        'clicked_button_ix': 3, 'n_buttons': 3
-        })
+    cols = st.columns(3)
+    with cols[0]:
+        with st.container(border=False, height=100):
+            st.markdown('<div class="button-container">', unsafe_allow_html=True)
+            business_btn = st.button("Business",use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+    with cols[1]:
+        with st.container(border=False, height=100):
+            st.markdown('<div class="button-container">', unsafe_allow_html=True)
+            customer_btn = st.button("Customer",use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+    with cols[2]:
+        with st.container(border=False, height=100):
+            st.markdown('<div class="button-container">', unsafe_allow_html=True)
+            subscription_btn = st.button("Subscription",use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
     # business_btn = st.button("Business")
     # customer_btn = st.button("Customer")
     # subscription_btn = st.button("Subscription")
@@ -167,8 +175,8 @@ def extract_city_from_geocode(location):
 
 # Business Page
 def business_page():
-    st.title("Business Page")
-    st.header("Submit Your Event Details")
+    st.title("Submit Your Event Details!")
+    # st.header("Submit Your Event Details")
 
     business_name = st.text_input("Enter Business Name")
     address = st.text_input("Enter Business Address")
