@@ -1,9 +1,8 @@
 
-    body {
-        background-color: #d0d0d0;
-    }
     .header {
-        background-color: #01002a;
+        /* background-color: #01002a; */
+        background-image: url("images/background.jpg");
+        background-size: cover;
         padding: 20px;
         color: white;
         text-align: left;

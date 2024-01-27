@@ -113,7 +113,7 @@ def home_page():
         page_title="BizBuzz",
         page_icon="✨",
         layout="wide",
-        initial_sidebar_state="collapsed",
+        initial_sidebar_state="collapsed"
     )
 
     with open('style.css') as f:
@@ -121,7 +121,7 @@ def home_page():
         st.markdown(f'<style>{custom_style}</style>', unsafe_allow_html=True)
 
     st.markdown('<div class="header">Welcome to BizBuzz!</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subheader">Select an Option:</div>', unsafe_allow_html=True)
+    # st.markdown('<div class="subheader">Select an Option:</div>', unsafe_allow_html=True)
 
     # button_container = st.markdown('<div class="button-container">', unsafe_allow_html=True)
     business_btn, customer_btn, subscription_btn = st.sidebar.columns([1, 1, 1])
@@ -153,6 +153,10 @@ def home_page():
     elif session_state.page == "subscription":
         subscription_page()
 
+    
+    local_image_path = "./images/background_text.jpg"
+    st.image(local_image_path, use_column_width=True)
+
 
 def extract_city_from_geocode(location):
     # Extract city from the address_components
@@ -183,10 +187,9 @@ def business_page():
     # image_upload = st.file_uploader("Upload Event Image", type=["jpg", "png", "jpeg"])
 
     start_date = st.date_input("Start Date")
-    end_date = st.date_input("End Date (Optional)")
-
     start_time = st.time_input("Start Time")
-    end_time = st.time_input("End Time (Optional)")
+    end_date = st.date_input("End Date")
+    end_time = st.time_input("End Time")
     start_datetime = f"{start_date} {start_time}"
     end_datetime = f"{end_date} {end_time}"
 
@@ -212,8 +215,8 @@ def business_page():
 
 # Customer Page
 def customer_page():
-    st.title("Customer Page")
-    st.header("Discover Events Near You")
+    st.title("Discover Events Near You!")
+    # st.header("Discover Events Near You")
 
     user_location = st.text_input("Enter Your Location")
     locator = GoogleV3(api_key=GOOGLE_MAPS_API_KEY)
@@ -222,16 +225,40 @@ def customer_page():
     if location:
         st.info(f"Selected Address: {location.address}")
 
-    if location:
+        selected_event_types = st.multiselect("Select Event Types", ["Art", "Music", "Food", "Social", "Entertainment", "Holiday"])
+        selected_audience = st.multiselect("Select Audience", ["Student", "Senior Citizen", "Kids", "General"])
         user_latitude, user_longitude = location.latitude, location.longitude
-        display_posts(user_latitude, user_longitude)
+    if st.button("Search"):
+        display_posts(user_latitude, user_longitude, selected_event_types, selected_audience)
 
 # Function to fetch and display posts
-def display_posts(user_latitude, user_longitude):
+def display_posts(user_latitude, user_longitude, selected_event_types, selected_audience):
     conn = create_connection()
     cursor = conn.cursor()
 
-    cursor.execute('SELECT * FROM events ORDER BY start_datetime DESC')
+    query = 'SELECT * FROM events WHERE datetime(end_datetime) > CURRENT_TIMESTAMP '
+    # query = 'SELECT * FROM events WHERE 1 > 0 '
+    params = []
+
+    if selected_event_types:
+        query += 'AND ('
+        query += ' OR '.join(["event_type LIKE ?" for _ in selected_event_types])
+        params.extend(['%{}%'.format(event_type) for event_type in selected_event_types])
+        query = query.rstrip("OR ") + ') '
+
+
+    if selected_audience:
+        query += 'AND ('
+        query += ' OR '.join(["audience LIKE ?" for _ in selected_audience])
+        params.extend(['%{}%'.format(audience) for audience in selected_audience])
+        query = query.rstrip("OR ") + ') '
+
+    query += 'ORDER BY end_datetime ASC'
+
+    print("Executing query:", query)
+    print("With parameters:", params)
+
+    cursor.execute(query, params)
     events = cursor.fetchall()
 
     for event in events:
@@ -240,6 +267,10 @@ def display_posts(user_latitude, user_longitude):
             st.write("Business Name:", event[1])
             st.write("Event Description:", event[3])
             st.write("Distance:", f"{distance:.2f} km")
+            st.write("Start Date:", event[4])
+            st.write("End Date:", event[5])
+            st.write("Audience:", event[7])
+            st.write("Event Type:", event[8])
 
             # Use a unique identifier for the like button based on event ID
             like_button_key = f"like_button_{event[0]}"
