@@ -1,0 +1,31 @@
+
+    body {
+        background-color: #d0d0d0;
+    }
+    .header {
+        background-color: #1a1a1a;
+        padding: 20px;
+        color: white;
+        text-align: left;
+        font-size: 24px;
+    }
+    .subhead-container {
+        text-align: left;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .subheader {
+        color: #333; 
+        font-size: 20px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    .title {
+        color: #333; 
+        font-size: 28px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+    .button-container {
+        text-align: left;
+    }

@@ -108,15 +108,37 @@ def get_session_state():
 
 # Home page
 def home_page():
-    st.title("Event Platform")
-    st.header("Welcome to the Home Page")
+    # st.header("Welcome to the Home Page")
+    st.set_page_config(
+        page_title="BizBuzz",
+        page_icon="✨",
+        layout="wide",
+        initial_sidebar_state="collapsed",
+    )
 
-    st.subheader("Select an Option:")
+    with open('style.css') as f:
+        custom_style = f.read()
+        st.markdown(f'<style>{custom_style}</style>', unsafe_allow_html=True)
+
+    st.markdown('<div class="header">Welcome to BizBuzz!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subheader">Select an Option:</div>', unsafe_allow_html=True)
+
+    # button_container = st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    business_btn, customer_btn, subscription_btn = st.sidebar.columns([1, 1, 1])
+    business_btn = st.button("Business", kwargs={
+        'clicked_button_ix': 1, 'n_buttons': 3
+        })
+    customer_btn = st.button("Customer", kwargs={
+        'clicked_button_ix': 2, 'n_buttons': 3
+        })
+    subscription_btn = st.button("Subscription", kwargs={
+        'clicked_button_ix': 3, 'n_buttons': 3
+        })
+    # business_btn = st.button("Business")
+    # customer_btn = st.button("Customer")
+    # subscription_btn = st.button("Subscription")
+    
     session_state = get_session_state()
-    business_btn = st.button("Business")
-    customer_btn = st.button("Customer")
-    subscription_btn = st.button("Subscription")
-
     if business_btn:
         session_state.page = "business"
     elif customer_btn:
