@@ -39,9 +39,48 @@ def init_db():
         )
     ''')
 
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS subscribers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE,
+            location TEXT
+        )
+    ''')
 
     conn.commit()
     conn.close()
+
+def subscribe_email(email, location):
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute('INSERT INTO subscribers (email, location) VALUES (?, ?)', (email, location))
+        conn.commit()
+        st.success("Subscription Successful! You will receive event notifications.")
+    except sqlite3.IntegrityError:
+        st.warning("Email already subscribed!")
+
+    conn.close()
+
+def subscription_page():
+    st.title("Subscription Page")
+    st.header("Subscribe for Event Notifications")
+
+    email = st.text_input("Enter Your Email")
+    user_location = st.text_input("Enter Your Location")
+
+    locator = GoogleV3(api_key=GOOGLE_MAPS_API_KEY)
+    location = locator.geocode(user_location, components={"country": "US"})
+
+    if location:
+        st.info(f"Selected Address: {location.address}")
+
+        if st.button("Subscribe"):
+            subscribe_email(email, location.address)
+    else:
+        st.warning("Invalid Location. Please enter a valid location.")
+
 
 # Function to insert an event into the database
 def insert_event(data):
@@ -76,17 +115,21 @@ def home_page():
     session_state = get_session_state()
     business_btn = st.button("Business")
     customer_btn = st.button("Customer")
+    subscription_btn = st.button("Subscription")
 
     if business_btn:
         session_state.page = "business"
-
-    if customer_btn:
+    elif customer_btn:
         session_state.page = "customer"
+    elif subscription_btn:
+        session_state.page = "subscription"
 
     if session_state.page == "business":
         business_page()
     elif session_state.page == "customer":
         customer_page()
+    elif session_state.page == "subscription":
+        subscription_page()
 
 
 def extract_city_from_geocode(location):
