@@ -4,6 +4,8 @@ import sqlite3
 from geopy.geocoders import Nominatim
 import googlemaps
 from datetime import datetime, timedelta
+from geopy.geocoders import GoogleV3
+from geopy.geocoders import Nominatim
 
 # Set your Google Maps API key
 GOOGLE_MAPS_API_KEY = 'AIzaSyB1fci-tkq5acaMq03CHA0nX539iZ6aexE'
@@ -86,6 +88,13 @@ def home_page():
         customer_page()
 
 
+def extract_city_from_geocode(location):
+    # Extract city from the address_components
+    for component in location.raw.get("address_components", []):
+        if "locality" in component["types"]:
+            return component["long_name"]
+
+
 # Business Page
 def business_page():
     st.title("Business Page")
@@ -93,6 +102,17 @@ def business_page():
 
     business_name = st.text_input("Enter Business Name")
     address = st.text_input("Enter Business Address")
+    # Autocomplete for address using Google Places API
+    locator = GoogleV3(api_key=GOOGLE_MAPS_API_KEY)
+    location = locator.geocode(address, components={"country": "US"})
+
+    if location:
+        st.info(f"Selected Address: {location.address}")
+        city = extract_city_from_geocode(location)
+    else:
+        city = st.text_input("Enter City:")
+
+
     event_description = st.text_area("Event Description")
     # image_upload = st.file_uploader("Upload Event Image", type=["jpg", "png", "jpeg"])
 
@@ -129,8 +149,11 @@ def customer_page():
     st.header("Discover Events Near You")
 
     user_location = st.text_input("Enter Your Location")
-    geolocator = Nominatim(user_agent="event_platform")
-    location = geolocator.geocode(user_location)
+    locator = GoogleV3(api_key=GOOGLE_MAPS_API_KEY)
+    location = locator.geocode(user_location, components={"country": "US"})
+
+    if location:
+        st.info(f"Selected Address: {location.address}")
 
     if location:
         user_latitude, user_longitude = location.latitude, location.longitude
@@ -161,8 +184,18 @@ def calculate_distance(lat1, lon1, address) -> int:
     location = geolocator.geocode(address)
     if location:
         lat2, lon2 = location.latitude, location.longitude
-        distance = googlemaps.distance_matrix((lat1, lon1), (lat2, lon2))["rows"][0]["elements"][0]["distance"]["value"]
-        return int(distance / 1000)  # Convert to kilometers
+        origin = (lat1, lon1)
+        destination = (lat2, lon2)
+
+        # Use the distance_matrix function to get distance information
+        result = gmaps.distance_matrix(origin, destination)
+
+        # Extract the distance value
+        distance = result['rows'][0]['elements'][0]['distance']['value']
+
+        # Convert distance to kilometers
+        distance_in_km = distance / 1000
+        return int(distance_in_km)  # Convert to kilometers
 
 # Run the app
 if __name__ == "__main__":
