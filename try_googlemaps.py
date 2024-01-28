@@ -67,8 +67,8 @@ def subscription_page():
     st.title("Subscribe for Event Notifications!")
     # st.header("Subscribe for Event Notifications")
 
-    email = st.text_input("Enter Your Email")
-    user_location = st.text_input("Enter Your Location")
+    email = st.text_input("Your Email")
+    user_location = st.text_input("Your Location")
 
     locator = GoogleV3(api_key=GOOGLE_MAPS_API_KEY)
     location = locator.geocode(user_location, components={"country": "US"})
@@ -180,8 +180,8 @@ def business_page():
     st.title("Submit Your Event Details!")
     # st.header("Submit Your Event Details")
 
-    business_name = st.text_input("Enter Business Name")
-    address = st.text_input("Enter Business Address")
+    business_name = st.text_input("Business Name")
+    address = st.text_input("Business Address")
     # Autocomplete for address using Google Places API
     locator = GoogleV3(api_key=GOOGLE_MAPS_API_KEY)
     location = locator.geocode(address, components={"country": "US"})
@@ -190,7 +190,7 @@ def business_page():
         st.info(f"Selected Address: {location.address}")
         city = extract_city_from_geocode(location)
     else:
-        city = st.text_input("Enter City:")
+        city = st.text_input("City:")
 
 
     event_description = st.text_area("Event Description")
@@ -228,7 +228,7 @@ def customer_page():
     st.title("Discover Events Near You!")
     # st.header("Discover Events Near You")
 
-    user_location = st.text_input("Enter Your Location")
+    user_location = st.text_input("Your Location")
     locator = GoogleV3(api_key=GOOGLE_MAPS_API_KEY)
     location = locator.geocode(user_location, components={"country": "US"})
 
