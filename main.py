@@ -127,14 +127,14 @@ def sendgrid_api(event_data):
         subscriber_email = subscriber[1]
 
         # Compose the message
-        message = f"New Event Near You:\n{event_data[0]} - {event_data[3]}"
+        message = f"<strong>{event_data[0]}:</strong><br>Event Description: <em>{event_data[2]}</em><br>📍{event_data[1]}<br>📅 {event_data[3]}-{event_data[4]}<br>Audience: {event_data[6]}<br>Event Type: {event_data[7]}"
         from_email = Email("srd130@pitt.edu")
         to_emails = To(str(subscriber_email))
-        subject = "BizBuzz: Events Near You"
+        subject = "BizBuzz: Event Near You!"
 
         # Create Mail object
         mail = Mail(
-            from_email, to_emails, subject, message
+            from_email, to_emails, subject, html_content=message
         )
 
         # Send the email
@@ -142,7 +142,7 @@ def sendgrid_api(event_data):
         
         # Check if the email was sent successfully
         if response.status_code == 202:
-            st.success('Email sent successfully!')
+            print('Email sent successfully!')
         else:
             st.error('Failed to send email. Check your API key and try again.')
                 
