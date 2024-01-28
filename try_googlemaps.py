@@ -12,11 +12,13 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import *
 
+load_dotenv()
+
 # Set your SendGrid API key
-SENDGRID_API_KEY = os.getenv(SENDGRID_KEY)
+SENDGRID_API_KEY = os.getenv('SENDGRID_KEY')
 
 # Set your Google Maps API key
-GOOGLE_MAPS_API_KEY = os.getenv(GOOGLE_MAPS_KEY)
+GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_KEY')
 gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
 
