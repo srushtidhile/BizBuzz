@@ -367,7 +367,7 @@ def display_posts(user_latitude, user_longitude, selected_event_types, selected_
                     st.write("Likes:", current_likes)
 
                     # Check if the Like button is clicked
-                    st.button("like", key=like_button_key, on_click=lambda e=event[0]: update_likes(e))
+                    st.button("❤", key=like_button_key, on_click=lambda e=event[0]: update_likes(e))
                         # update_likes(event[0])  # Update likes for the specific event
 
     conn.close()
