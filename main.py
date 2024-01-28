@@ -11,7 +11,6 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import *
 
 # Set your SendGrid API key
-SENDGRID_API_KEY = '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'
 
 # Set your Google Maps API key
 GOOGLE_MAPS_API_KEY = 'AIzaSyB1fci-tkq5acaMq03CHA0nX539iZ6aexE'
