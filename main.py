@@ -75,12 +75,27 @@ def subscribe_email(email, location, subscriber_latitude, subscriber_longitude):
 
     conn.close()
 
+def unsubscribe_email(email):
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute('DELETE FROM subscribers WHERE email = ?', (email,))
+        if cursor.rowcount > 0:
+            conn.commit()
+            st.success("Unsubscription Successful! You will no longer receive event notifications.")
+        else:
+            st.warning("Email not found for unsubscription.")
+    except sqlite3.Error as e:
+        print(f"Error during unsubscribe operation: {e}")
+        st.error("An error occurred during unsubscription.")
+
 def subscription_page():
     st.title("Subscribe for Event Notifications!")
     # st.header("Subscribe for Event Notifications")
 
     email = st.text_input("Your Email")
-    user_location = st.text_input("Your Location")
+    user_location = st.text_input("Your Location (after typing, hit enter)")
 
     locator = GoogleV3(api_key=GOOGLE_MAPS_API_KEY)
     location = locator.geocode(user_location, components={"country": "US"})
@@ -89,8 +104,10 @@ def subscription_page():
         st.info(f"Selected Address: {location.address}")
         subscriber_latitude, subscriber_longitude = location.latitude, location.longitude
 
-        if st.button("Subscribe"):
+        if st.button("$subscribe$"):
             subscribe_email(email, location.address, subscriber_latitude, subscriber_longitude)
+        if st.button("$unsubscribe$"):
+            unsubscribe_email(email)
     else:
         st.warning("Invalid Location. Please enter a valid location.")
 
@@ -233,7 +250,7 @@ def business_page():
     # st.header("Submit Your Event Details")
 
     business_name = st.text_input("Business Name")
-    address = st.text_input("Business Address")
+    address = st.text_input("Business Address (after typing, hit enter)")
     # Autocomplete for address using Google Places API
     locator = GoogleV3(api_key=GOOGLE_MAPS_API_KEY)
     location = locator.geocode(address, components={"country": "US"})
@@ -280,7 +297,7 @@ def customer_page():
     st.title("Discover Events Near You!")
     # st.header("Discover Events Near You")
 
-    user_location = st.text_input("Your Location")
+    user_location = st.text_input("Your Location (after typing, hit enter)")
     locator = GoogleV3(api_key=GOOGLE_MAPS_API_KEY)
     location = locator.geocode(user_location, components={"country": "US"})
 
