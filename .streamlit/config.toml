@@ -1,10 +1,10 @@
 [theme] # You have to add this line
 
-primaryColor = '#FF8C02' # Bright Orange
+primaryColor = '#FFBAF1' # Bright pink
 
 backgroundColor = '#00325B' # Dark Blue
 
-secondaryBackgroundColor = '#55B2FF' # Lighter Blue
+secondaryBackgroundColor = '#4D7CA3' # Lighter Blue
 
 textColor = '#FFFFFF'
 
