@@ -6,15 +6,17 @@ import googlemaps
 from datetime import datetime, timedelta
 from geopy.geocoders import GoogleV3
 from geopy.geocoders import Nominatim
+from dotenv import load_dotenv
+import os
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import *
 
 # Set your SendGrid API key
-SENDGRID_API_KEY = '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'
+SENDGRID_API_KEY = os.getenv(SENDGRID_KEY)
 
 # Set your Google Maps API key
-GOOGLE_MAPS_API_KEY = 'AIzaSyB1fci-tkq5acaMq03CHA0nX539iZ6aexE'
+GOOGLE_MAPS_API_KEY = os.getenv(GOOGLE_MAPS_KEY)
 gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
 
