@@ -7,6 +7,12 @@ from datetime import datetime, timedelta
 from geopy.geocoders import GoogleV3
 from geopy.geocoders import Nominatim
 
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import *
+
+# Set your SendGrid API key
+SENDGRID_API_KEY = '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'
+
 # Set your Google Maps API key
 GOOGLE_MAPS_API_KEY = 'AIzaSyB1fci-tkq5acaMq03CHA0nX539iZ6aexE'
 gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
@@ -43,19 +49,21 @@ def init_db():
         CREATE TABLE IF NOT EXISTS subscribers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE,
-            location TEXT
+            location TEXT,
+            subscriber_latitude FLOAT,
+            subscriber_longitude FLOAT
         )
     ''')
 
     conn.commit()
     conn.close()
 
-def subscribe_email(email, location):
+def subscribe_email(email, location, subscriber_latitude, subscriber_longitude):
     conn = create_connection()
     cursor = conn.cursor()
 
     try:
-        cursor.execute('INSERT INTO subscribers (email, location) VALUES (?, ?)', (email, location))
+        cursor.execute('INSERT INTO subscribers (email, location, subscriber_latitude, subscriber_longitude) VALUES (?, ?, ?, ?)', (email, location, subscriber_latitude, subscriber_longitude))
         conn.commit()
         st.success("Subscription Successful! You will receive event notifications.")
     except sqlite3.IntegrityError:
@@ -75,9 +83,10 @@ def subscription_page():
 
     if location:
         st.info(f"Selected Address: {location.address}")
+        subscriber_latitude, subscriber_longitude = location.latitude, location.longitude
 
         if st.button("Subscribe"):
-            subscribe_email(email, location.address)
+            subscribe_email(email, location.address, subscriber_latitude, subscriber_longitude)
     else:
         st.warning("Invalid Location. Please enter a valid location.")
 
@@ -93,7 +102,46 @@ def insert_event(data):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', data)
 
+    sendgrid_api(data)
+
     conn.commit()
+    conn.close()
+
+def sendgrid_api(event_data):
+    # Initialize SendGrid client
+    sg = SendGridAPIClient(SENDGRID_API_KEY)
+
+    print('entered sendgrid function')
+
+    # Fetch subscribers within 50 km of the event address
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM subscribers')
+    subscribers = cursor.fetchall()
+
+    for subscriber in subscribers:
+        subscriber_email = subscriber[1]
+
+        # Compose the message
+        message = f"New Event Near You:\n{event_data[0]} - {event_data[3]}"
+        from_email = Email("srd130@pitt.edu")
+        to_emails = To(str(subscriber_email))
+        subject = "BizBuzz: Events Near You"
+
+        # Create Mail object
+        mail = Mail(
+            from_email, to_emails, subject, message
+        )
+
+        # Send the email
+        response = sg.send(mail)
+        
+        # Check if the email was sent successfully
+        if response.status_code == 202:
+            st.success('Email sent successfully!')
+        else:
+            st.error('Failed to send email. Check your API key and try again.')
+                
     conn.close()
 
 # Function to get or create session state
