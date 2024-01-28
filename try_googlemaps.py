@@ -132,17 +132,17 @@ def home_page():
     with cols[0]:
         with st.container(border=False, height=100):
             st.markdown('<div class="button-container">', unsafe_allow_html=True)
-            business_btn = st.button("Business",use_container_width=True)
+            business_btn = st.button("$business$",use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
     with cols[1]:
         with st.container(border=False, height=100):
             st.markdown('<div class="button-container">', unsafe_allow_html=True)
-            customer_btn = st.button("Customer",use_container_width=True)
+            customer_btn = st.button("$customer$",use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
     with cols[2]:
         with st.container(border=False, height=100):
             st.markdown('<div class="button-container">', unsafe_allow_html=True)
-            subscription_btn = st.button("Subscription",use_container_width=True)
+            subscription_btn = st.button("$subscription$",use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
     # business_btn = st.button("Business")
     # customer_btn = st.button("Customer")
@@ -211,7 +211,7 @@ def business_page():
     business_email = st.text_input("Business Email (not displayed on post)")
     likes = 0
 
-    if st.button("Submit"):
+    if st.button("$submit$"):
         data = (
             business_name, address, event_description,
             start_datetime, end_datetime,
@@ -238,7 +238,7 @@ def customer_page():
         selected_event_types = st.multiselect("Select Event Types", ["Art", "Music", "Food", "Social", "Entertainment", "Holiday"])
         selected_audience = st.multiselect("Select Audience", ["Student", "Senior Citizen", "Kids", "General"])
         user_latitude, user_longitude = location.latitude, location.longitude
-    if st.button("Search"):
+    if st.button("$search$"):
         display_posts(user_latitude, user_longitude, selected_event_types, selected_audience)
 
 # Function to fetch and display posts
@@ -298,8 +298,8 @@ def display_posts(user_latitude, user_longitude, selected_event_types, selected_
                     st.write("Likes:", current_likes)
 
                     # Check if the Like button is clicked
-                    if st.button("❤", key=like_button_key):
-                        update_likes(event[0])  # Update likes for the specific event
+                    st.button("like", key=like_button_key, on_click=lambda e=event[0]: update_likes(e))
+                        # update_likes(event[0])  # Update likes for the specific event
 
     conn.close()
 
@@ -314,6 +314,7 @@ def update_likes(event_id):
 
     # Update likes count
     cursor.execute('UPDATE events SET likes = ? WHERE id = ?', (current_likes + 1, event_id))
+    # print(event_id, "likes updated to", current_likes + 1)
 
     conn.commit()
     conn.close()
