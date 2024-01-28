@@ -164,7 +164,7 @@ def home_page():
         subscription_page()
 
     
-    local_image_path = "./images/background_text.jpg"
+    local_image_path = "./images/author.png"
     st.image(local_image_path, use_column_width=True)
 
 
